@@ -51,7 +51,8 @@ int main(void) {
   std::vector<cl::Platform> PlatformList;
 
   ////////////// Exercise 1 Step 2.3
-  err = checkErr(err, "Get Platform List");
+  err = cl::Platform::get(&PlatformList);
+  checkErr(err, "Get Platform List");
   checkErr(PlatformList.size() >= 1 ? CL_SUCCESS : -1, "cl::Platform::get");
   print_platform_info(&PlatformList);
   // Look for Fast Emulation Platform
@@ -63,27 +64,32 @@ int main(void) {
   std::vector<cl::Device> DeviceList;
 
   ////////////// Exercise 1 Step 2.5
-  err = checkErr(err, "Get Devices");
+  err = PlatformList[current_platform_id].getDevices(CL_DEVICE_TYPE_ALL, &DeviceList);
+  checkErr(err, "Get Devices");
   print_device_info(&DeviceList);
 
   // Create Context
   ////////////// Exercise 1 Step 2.6
-  cl::Context checkErr(err, "Context Constructor");
+  cl::Context mycontext(DeviceList, NULL, NULL, NULL, &err);
+  checkErr(err, "Context Constructor");
 
   // Create Command queue
   ////////////// Exercise 1 Step 2.7
-  cl::CommandQueue checkErr(err, "Queue Constructor");
+  cl::CommandQueue myqueue(mycontext, DeviceList[0], 0, &err);
+  checkErr(err, "Queue Constructor");
 
   // Create Buffers for input and output
   ////////////// Exercise 1 Step 2.8
-  cl::Buffer cl::Buffer cl::Buffer
+  cl::Buffer Buffer_In(mycontext, CL_MEM_READ_ONLY, sizeof(cl_float) * vectorSize);
+  cl::Buffer Buffer_In2(mycontext, CL_MEM_READ_ONLY, sizeof(cl_float) * vectorSize);
+  cl::Buffer Buffer_Out(mycontext, CL_MEM_WRITE_ONLY, sizeof(cl_float) * vectorSize);
 
-      // Inputs and Outputs to Kernel, X and Y are inputs, Z is output
-      // The aligned attribute is used to ensure alignment
-      // so that DMA could be used if we were working with a real FPGA board
-      cl_float X[vectorSize] __attribute__((aligned(64)));
-  cl_float     Y[vectorSize] __attribute__((aligned(64)));
-  cl_float     Z[vectorSize] __attribute__((aligned(64)));
+  // Inputs and Outputs to Kernel, X and Y are inputs, Z is output
+  // The aligned attribute is used to ensure alignment
+  // so that DMA could be used if we were working with a real FPGA board
+  cl_float X[vectorSize] __attribute__((aligned(64)));
+  cl_float Y[vectorSize] __attribute__((aligned(64)));
+  cl_float Z[vectorSize] __attribute__((aligned(64)));
 
   // Allocates memory with value from 0 to 1000
   cl_float LO = 0;
@@ -92,67 +98,12 @@ int main(void) {
 
   // Write data to device
   ////////////// Exercise 1 Step 2.9
-  err = checkErr(err, "WriteBuffer");
-  err = checkErr(err, "WriteBuffer 2");
+  err = myqueue.enqueueWriteBuffer(Buffer_In, CL_FALSE, 0, sizeof(cl_float) * vectorSize, X);
+  checkErr(err, "WriteBuffer");
+  err = myqueue.enqueueWriteBuffer(Buffer_In2, CL_FALSE, 0, sizeof(cl_float) * vectorSize, Y);
+  checkErr(err, "WriteBuffer 2");
   myqueue.finish();
 
-#ifndef EXERCISE1
-  // create the kernel
-  const char *kernel_name = "SimpleKernel";
 
-  // Read in binaries from file
-  std::ifstream aocx_stream("../SimpleKernel.aocx", std::ios::in | std::ios::binary);
-  checkErr(aocx_stream.is_open() ? CL_SUCCESS : -1, "SimpleKernel.aocx");
-  std::string           prog(std::istreambuf_iterator<char>(aocx_stream), (std::istreambuf_iterator<char>()));
-  cl::Program::Binaries mybinaries(1, std::make_pair(prog.c_str(), prog.length()));
-
-  // Create the Program from the AOCX file.
-  ////////////////////// Exercise 2 Step 2.3    ///////////////////
-  cl::Program checkErr(err, "Program Constructor");
-
-  // build the program
-  //////////////      Compile the Kernel.... For Intel FPGA, nothing is done here, but this conforms to the
-  ///standard
-  //////////////       Exercise 2   Step 2.4    ///////////////////
-  err = checkErr(err, "Build Program");
-
-  // create the kernel
-  //////////////       Find Kernel in Program
-  //////////////       Exercise 2   Step 2.5    ///////////////////
-  cl::Kernel checkErr(err, "Kernel Creation");
-
-  //////////////     Set Arguments to the Kernels
-  //////////////       Exercise 2   Step 2.6    ///////////////////
-  err = checkErr(err, "Arg 0");
-  err = checkErr(err, "Arg 1");
-  err = checkErr(err, "Arg 2");
-  err = checkErr(err, "Arg 3");
-
-  printf("\nLaunching the kernel...\n");
-
-  // Launch Kernel
-  //////////////       Exercise 2   Step 2.7    ///////////////////
-  err = checkErr(err, "Kernel Execution");
-
-  // read the output
-  //////////////       Exercise 2   Step 2.8    ///////////////////
-  err = checkErr(err, "Read Buffer");
-
-  err = myqueue.finish();
-  checkErr(err, "Finish Queue");
-
-  float CalcZ[vectorSize];
-
-  for (uint i = 0; i < vectorSize; i++) {
-    //////////////  Equivalent Code running on CPUs
-    //////////////       Exercise 2   Step 2.9    ///////////////////
-    CalcZ[i] =
-  }
-
-  // Print Performance Results
-  verification(X, Y, Z, CalcZ, vectorSize);
-
-#endif
-
-  return 1;
+  return 0;
 }
