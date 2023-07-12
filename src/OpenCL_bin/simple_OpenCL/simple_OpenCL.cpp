@@ -35,7 +35,6 @@
 #include <stdio.h>
 #include <string>
 
-#include "CL/cl.hpp"
 #include "utility.h"
 
 static const cl_uint vectorSize = 4096; // must be evenly divisible by workSize

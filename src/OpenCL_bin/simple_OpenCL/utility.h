@@ -10,7 +10,7 @@
 #define UTILITY_H_
 
 // Includes
-#include <CL/cl.hpp>
+#include <CL/opencl.hpp>
 
 #define EPSILON (1e-2f)
 

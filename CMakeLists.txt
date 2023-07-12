@@ -33,7 +33,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g -O0")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(CMAKE_PREFIX_PATH "/opt/OpenCL/ICD-Loader/install/share/cmake" ${CMAKE_PREFIX_PATH})
+set(CMAKE_PREFIX_PATH "/opt/OpenCL/ICD-Loader/share/cmake" ${CMAKE_PREFIX_PATH})
 ##########################
 # Enable Static Analysis #
 ##########################
@@ -46,6 +46,7 @@ set(CMAKE_PREFIX_PATH "/opt/OpenCL/ICD-Loader/install/share/cmake" ${CMAKE_PREFI
 find_package(OpenCLHeaders REQUIRED)
 find_package(OpenCLICDLoader REQUIRED)
 
+# Create an output dir in CMAKE_BINARY_DIR
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${CMAKE_BUILD_TYPE})
 
 ### Project Source Tree ###
