@@ -50,36 +50,30 @@ int main(void) {
   // Get Platform ID
   std::vector<cl::Platform> PlatformList;
 
-  ////////////// Exercise 1 Step 2.3
   err = cl::Platform::get(&PlatformList);
   checkErr(err, "Get Platform List");
   checkErr(PlatformList.size() >= 1 ? CL_SUCCESS : -1, "cl::Platform::get");
   print_platform_info(&PlatformList);
   // Look for Fast Emulation Platform
-  uint current_platform_id = get_platform_id_with_string(&PlatformList, "Emulation");
+  uint current_platform_id = get_platform_id_with_string(&PlatformList, "Intel(R) OpenCL HD Graphics");
   printf("Using Platform: %d\n\n", current_platform_id);
 
   // Setup Device
   // Get Device ID
   std::vector<cl::Device> DeviceList;
-
-  ////////////// Exercise 1 Step 2.5
   err = PlatformList[current_platform_id].getDevices(CL_DEVICE_TYPE_ALL, &DeviceList);
   checkErr(err, "Get Devices");
   print_device_info(&DeviceList);
 
   // Create Context
-  ////////////// Exercise 1 Step 2.6
   cl::Context mycontext(DeviceList, NULL, NULL, NULL, &err);
   checkErr(err, "Context Constructor");
 
   // Create Command queue
-  ////////////// Exercise 1 Step 2.7
   cl::CommandQueue myqueue(mycontext, DeviceList[0], 0, &err);
   checkErr(err, "Queue Constructor");
 
   // Create Buffers for input and output
-  ////////////// Exercise 1 Step 2.8
   cl::Buffer Buffer_In(mycontext, CL_MEM_READ_ONLY, sizeof(cl_float) * vectorSize);
   cl::Buffer Buffer_In2(mycontext, CL_MEM_READ_ONLY, sizeof(cl_float) * vectorSize);
   cl::Buffer Buffer_Out(mycontext, CL_MEM_WRITE_ONLY, sizeof(cl_float) * vectorSize);
@@ -97,7 +91,6 @@ int main(void) {
   fill_generate(X, Y, Z, LO, HI, vectorSize);
 
   // Write data to device
-  ////////////// Exercise 1 Step 2.9
   err = myqueue.enqueueWriteBuffer(Buffer_In, CL_FALSE, 0, sizeof(cl_float) * vectorSize, X);
   checkErr(err, "WriteBuffer");
   err = myqueue.enqueueWriteBuffer(Buffer_In2, CL_FALSE, 0, sizeof(cl_float) * vectorSize, Y);

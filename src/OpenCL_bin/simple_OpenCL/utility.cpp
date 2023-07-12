@@ -86,6 +86,7 @@ void fill_generate(cl_float X[], cl_float Y[], cl_float Z[], cl_float LO, cl_flo
     X[i] = LO + (cl_float)rand() / ((cl_float)RAND_MAX / (HI - LO));
     Y[i] = LO + (cl_float)rand() / ((cl_float)RAND_MAX / (HI - LO));
   }
+  (void)Z;
 }
 
 bool verification(float X[], float Y[], float Z[], float CalcZ[], size_t vectorSize) {
